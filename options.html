@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Message Duplicate Destroyer Options</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <h2>Message Duplicate Destroyer Options</h2>
+  <form id="options-form">
+    <h3>Select that do you want to do with duplicate message</h3>
+    <div class="work-mode delete">
+      <label>
+        <input type="radio" name="work-mode" value="delete">
+        Delete message
+      </label>
+    </div>
+    <div class="work-mode update">
+    <label>
+      <input type="radio" name="work-mode" value="update" checked>
+      Update message
+    </label>
+    <div id="update-options">
+      Update options
+      <label>
+        <input type="checkbox" id="mark-read">
+        Mark as read
+      </label>
+
+     <label>
+        <input type="checkbox" id="add-tag">
+        Add tag
+      </label>
+      <select id="tag-list" style="display: none;">
+        
+      </select>
+      <label>
+        <input type="checkbox" id="move">
+        Move
+      </label>
+      <select id="folder-list" style="display: none;">
+        
+      </select>
+
+    </div>
+    </div>
+    <button id="save-options">Save Options</button>
+  </form>
+  <script src="options.js"></script>
+</body>
+</html>
