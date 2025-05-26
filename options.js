@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // get saved preferences
     const preference = await getPreference();
 
     // const optionsForm = document.getElementById('options-form');
@@ -31,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // populate tags and folders lists
-    
+
     const tags = await browser.messages.tags.list();
     const accounts = await browser.accounts.list(true); // true — включает вложенные папки
     const folders = await getFolderListFromAccounts(accounts);
@@ -70,8 +69,56 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // save options
-    saveOptionsButton.addEventListener('click', async () => {
+    saveOptionsButton.addEventListener('click', async (event) => {
+        event.preventDefault();
 
+        if (validateFormData()) {
+            try {
+                const newPreference = getNewPreference();
+                await savePreference(newPreference);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+
+
+        async function savePreference(newPreference) {
+            try {
+                await browser.storage.local.set(newPreference);
+                showStatusMessage("Options saved!", "green");
+            } catch (error) {
+                console.error(error);
+                showStatusMessage("Error: " + error.message, "red");
+            }            
+        }
+
+        function validateFormData() {
+            if (!document.querySelector('input[name="work-mode"]:checked')) {
+                showStatusMessage('Work mode should be deffined', "red");
+                return false;
+            }
+            if (document.querySelector('input[name="work-mode"]:checked').value === 'update') {
+                if (!markReadCheckbox.checked && !addTagCheckbox.checked && !moveCheckbox.checked) {
+                    showStatusMessage('Action should be deffined', "red");
+                    return false;
+                }    
+
+                if (addTagCheckbox.checked && !document.getElementById('tag-list')) {
+                    showStatusMessage('Tag should be deffined', "red");
+                    return false;
+                }
+
+                if (moveCheckbox.checked && !document.getElementById('folder-list')) {
+                    showStatusMessage('Folder should be deffined', "red");
+                    return false;
+                }
+            }
+            return true;
+        }
+    });
+
+    function getNewPreference() {
         let mode = preference.mode;
         const selectedWorkMode = document.querySelector('input[name="work-mode"]:checked');
         if (selectedWorkMode) {
@@ -79,56 +126,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         let read = false;
-        if (mode==='update' && markReadCheckbox.checked) {
+        if (mode === 'update' && markReadCheckbox.checked) {
             read = true;
         }
 
-        let tag = preference.tag;
-        if (mode==='update' && addTagCheckbox.checked) {
+        let tag = '';
+        if (mode === 'update' && addTagCheckbox.checked) {
             tag = document.getElementById('tag-list').value;
-        }   
+        }
 
-        let folder = preference.folder;
-        if (mode==='update' && moveCheckbox.checked) {
+        let folder = '';
+        if (mode === 'update' && moveCheckbox.checked) {
             folder = document.getElementById('folder-list').value;
         }
 
-        console.log('folder', folder);
-
-        if (validateFormData()) {
-            await savePreference();
-            alert('Options saved successfully!');
-        }    
-        
-      
-
-        async function savePreference() {
-            // await browser.storage.local.set({
-            //     mode, 
-            //     read, 
-            //     tag, 
-            //     folder
-            // });
-
-        }
-
-        function validateFormData() {
-            // validation
-            // if (workMode === 'update' && !(addTag || move || read)) {
-            //     alert('Please select at least one action type');
-            //     return;
-            // }
-            // if (addTag && !selectedTag) {
-            //     alert('Please select a tag');
-            //     return;
-            // }
-            // if (move && !selectedFolder) {
-            //     alert('Please select a folder');
-            //     return;
-            // }            
-            return true;
-        }
-    });
+        return {
+            mode,
+            read,
+            tag,
+            folder
+        };
+    }
 
     function showAndInitUpdateOptions() {
         updateOptions.style.display = 'block';
@@ -156,7 +174,7 @@ async function getPreference() {
         folder: '',
     };
     const savedPreferences = await browser.storage.local.get(['mode', 'read', 'tag', 'folder']);
-    return { ...savedPreferences, ...defaultPreferences };
+    return { ...defaultPreferences, ...savedPreferences };
 }
 
 async function getFolderListFromAccounts(accounts) {
@@ -170,7 +188,7 @@ async function getFolderListFromAccounts(accounts) {
 async function addAccountFolders(folder) {
     const folderList = [];
     if (!folder.isRoot) {
-        folderList.push({ id: folder.id, name: folder.name, account: folder.accountId });        
+        folderList.push({ id: folder.id, name: folder.name, account: folder.accountId });
     }
     if (folder.subFolders && folder.subFolders.length > 0) {
         for (const subFolder of folder.subFolders) {
@@ -178,4 +196,14 @@ async function addAccountFolders(folder) {
         }
     }
     return folderList;
+}
+
+function showStatusMessage(text, color) {
+    const statusEl = document.getElementById("status-message");
+    statusEl.textContent = text;
+    statusEl.style.color = color;
+    statusEl.style.display = "block";
+    setTimeout(() => {
+        statusEl.style.display = "none";
+    }, 2000);
 }
