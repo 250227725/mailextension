@@ -1,13 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // get saved preferences
-    const defaultPreferences = {
-        mode: 'update',
-        read: true,
-        tag: 'duplicate',
-        folder: '1',
-    };
-    const savedPreferences = await browser.storage.local.get(['mode', 'read', 'tag', 'folder']);
-    const preference = { ...savedPreferences, ...defaultPreferences };
+    const preference = await getPreference();
 
     // const optionsForm = document.getElementById('options-form');
     const workModeRadios = document.getElementsByName('work-mode');
@@ -129,6 +122,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 });
+
+async function getPreference() {
+    const defaultPreferences = {
+        mode: 'update',
+        read: true,
+        tag: 'duplicate',
+        folder: '1',
+    };
+    const savedPreferences = await browser.storage.local.get(['mode', 'read', 'tag', 'folder']);
+    return { ...savedPreferences, ...defaultPreferences };
+}
 
 async function getFolderListFromAccounts(accounts) {
     const folders = [];
