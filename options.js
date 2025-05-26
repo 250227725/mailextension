@@ -71,38 +71,44 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // save options
     saveOptionsButton.addEventListener('click', async () => {
-        const workMode = document.querySelector('input[name="work-mode"]:checked').value;
-        const addTag = document.getElementsByName('add-tag')[0].checked;
-        const move = document.getElementsByName('move')[0].checked;
-        const read = document.getElementsByName('read')[0].checked;
-        const selectedTag = tagList.value;
-        const selectedFolder = folderList.value;
+        if (validation()) {
+            await savePreference();
+            alert('Options saved successfully!');
+        }        
 
-        // validation
-        if (workMode === 'update' && !(addTag || move || read)) {
-            alert('Please select at least one action type');
-            return;
-        }
-        if (addTag && !selectedTag) {
-            alert('Please select a tag');
-            return;
-        }
-        if (move && !selectedFolder) {
-            alert('Please select a folder');
-            return;
+        async function savePreference() {
+            // await browser.storage.local.set({
+            //     workMode,
+            //     addTag,
+            //     move,
+            //     read,
+            //     selectedTag,
+            //     selectedFolder,
+            // });
+            // console.log('Данные сохранены', workMode,
+            //     addTag,
+            //     move,
+            //     read,
+            //     selectedTag,
+            //     selectedFolder);
         }
 
-        // save options to storage
-        await browser.storage.local.set({
-            workMode,
-            addTag,
-            move,
-            read,
-            selectedTag,
-            selectedFolder,
-        });
-
-        alert('Options saved successfully!');
+        function validation() {
+            // validation
+            // if (workMode === 'update' && !(addTag || move || read)) {
+            //     alert('Please select at least one action type');
+            //     return;
+            // }
+            // if (addTag && !selectedTag) {
+            //     alert('Please select a tag');
+            //     return;
+            // }
+            // if (move && !selectedFolder) {
+            //     alert('Please select a folder');
+            //     return;
+            // }            
+            return true;
+        }
     });
 
     function showAndInitUpdateOptions() {
