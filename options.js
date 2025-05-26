@@ -71,29 +71,48 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // save options
     saveOptionsButton.addEventListener('click', async () => {
-        if (validation()) {
+
+        let mode = preference.mode;
+        const selectedWorkMode = document.querySelector('input[name="work-mode"]:checked');
+        if (selectedWorkMode) {
+            mode = selectedWorkMode.value;
+        }
+
+        let read = false;
+        if (mode==='update' && markReadCheckbox.checked) {
+            read = true;
+        }
+
+        let tag = preference.tag;
+        if (mode==='update' && addTagCheckbox.checked) {
+            tag = document.getElementById('tag-list').value;
+        }   
+
+        let folder = preference.folder;
+        if (mode==='update' && moveCheckbox.checked) {
+            folder = document.getElementById('folder-list').value;
+        }
+
+        console.log('folder', folder);
+
+        if (validateFormData()) {
             await savePreference();
             alert('Options saved successfully!');
-        }        
+        }    
+        
+      
 
         async function savePreference() {
             // await browser.storage.local.set({
-            //     workMode,
-            //     addTag,
-            //     move,
-            //     read,
-            //     selectedTag,
-            //     selectedFolder,
+            //     mode, 
+            //     read, 
+            //     tag, 
+            //     folder
             // });
-            // console.log('Данные сохранены', workMode,
-            //     addTag,
-            //     move,
-            //     read,
-            //     selectedTag,
-            //     selectedFolder);
+
         }
 
-        function validation() {
+        function validateFormData() {
             // validation
             // if (workMode === 'update' && !(addTag || move || read)) {
             //     alert('Please select at least one action type');
@@ -133,8 +152,8 @@ async function getPreference() {
     const defaultPreferences = {
         mode: 'update',
         read: true,
-        tag: 'duplicate',
-        folder: '1',
+        tag: '',
+        folder: '',
     };
     const savedPreferences = await browser.storage.local.get(['mode', 'read', 'tag', 'folder']);
     return { ...savedPreferences, ...defaultPreferences };
