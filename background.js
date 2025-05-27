@@ -5,9 +5,9 @@ browser.messages.onNewMailReceived.addListener(async (folder, newMessageList) =>
 
     for (const newMessage of newMessageList.messages) {
         if (await lookupDuplicate(newMessage)) {
-            updateNewMessage(newMessage);
-        } else {
-            skipNewMessage(newMessage);
+            actions.forEach((action) => {
+                updateNewMessage(newMessage, action.action, action.option);
+            });
         }
     }
 });
@@ -26,10 +26,10 @@ async function getActionSettings() {
             actions.push({ action: 'markRead' });
         }
         if (savedPreferences.tag) {
-            actions.push({ action: 'addTag', tag: savedPreferences.tag });
+            actions.push({ action: 'addTag', option: savedPreferences.tag });
         }
         if (savedPreferences.folder) {
-            actions.push({ action: 'move', folder: savedPreferences.folder });
+            actions.push({ action: 'move', option: savedPreferences.folder });
         }
     }
     return actions;
@@ -69,25 +69,18 @@ function checkMessageForDuplicate(newMessage, message) {
     return newMessage.id > message.id;
 }
 
-function updateNewMessage(newMessage, actionType = 'skip', option = '') {
-    actionType = 'skip'; //debug
-    option = newMessage.folder.accountId + '://Archive'; //debug
-    option = 'duplicate';
-
-    if (actionType === 'addTag') {
+function updateNewMessage(newMessage, action = 'skip', option = '') {
+    if (action === 'addTag') {
         browser.messages.update(newMessage.id, { tags: [option] });
-    } else if (actionType === 'delete') {
+    } else if (action === 'delete') {
         browser.messages.update(newMessage.id, { read: true });
         browser.messages.delete([newMessage.id], false);
-    } else if (actionType === 'move') {
+    } else if (action === 'move') {
         browser.messages.move([newMessage.id], option);
-    } else if (actionType === 'markRead') {
+    } else if (action === 'markRead') {
         browser.messages.update(newMessage.id, { read: true });
     }
 
-    console.log('New message (id:', newMessage.id, ') has been ', actionType);
+    console.log('New message (id:', newMessage.id, ') has been ', action);
 }
 
-function skipNewMessage(newMessage) {
-    console.log('New message (id:', newMessage.id, ') has been skipped');
-}
