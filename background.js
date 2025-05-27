@@ -1,23 +1,7 @@
 browser.messages.onNewMailReceived.addListener(async (folder, newMessageList) => {
-    const savedPreferences = await browser.storage.local.get(['mode', 'read', 'tag', 'folder']);
-    if (!savedPreferences) {
-        return;
-    }
+    const actions = await getActionSettings();
 
-    const actions = [];
-    if (savedPreferences.mode === 'delete') {
-        actions.push('delete');
-    } else {
-        if (savedPreferences.read) {
-            actions.push('markRead');
-        }
-        if (savedPreferences.tag) {
-            actions.push('addTag');
-        }
-        if (savedPreferences.folder) {
-            actions.push('move');
-        }
-    }
+    console.log(actions);
 
     for (const newMessage of newMessageList.messages) {
         if (await lookupDuplicate(newMessage)) {
@@ -27,6 +11,29 @@ browser.messages.onNewMailReceived.addListener(async (folder, newMessageList) =>
         }
     }
 });
+
+async function getActionSettings() {
+    const savedPreferences = await browser.storage.local.get(['mode', 'read', 'tag', 'folder']);
+    if (!savedPreferences) {
+        return;
+    }
+
+    const actions = [];
+    if (savedPreferences.mode === 'delete') {
+        actions.push({ action: 'delete' });
+    } else {
+        if (savedPreferences.read) {
+            actions.push({ action: 'markRead' });
+        }
+        if (savedPreferences.tag) {
+            actions.push({ action: 'addTag', tag: savedPreferences.tag });
+        }
+        if (savedPreferences.folder) {
+            actions.push({ action: 'move', folder: savedPreferences.folder });
+        }
+    }
+    return actions;
+}
 
 async function lookupDuplicate(newMessage) {
     const messages = await getMessagesFromBD(newMessage);
