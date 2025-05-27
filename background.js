@@ -11,24 +11,22 @@ browser.messages.onNewMailReceived.addListener(async (folder, newMessageList) =>
 });
 
 async function getActionSettings() {
-    const savedPreferences = await browser.storage.local.get(['mode', 'read', 'tag', 'folder']);
-    if (!savedPreferences) {
-        return;
-    }
+    const defaultPreferences = {
+        mode: 'update',
+        read: true,
+        tag: '',
+        folder: '',
+    };
+    const loadPreferences = await browser.storage.local.get(['mode', 'read', 'tag', 'folder']);
+    const preferences = { ...defaultPreferences, ...loadPreferences };
 
     const actions = [];
-    if (savedPreferences.mode === 'delete') {
+    if (preferences.mode === 'delete') {
         actions.push({ action: 'delete' });
     } else {
-        if (savedPreferences.read) {
-            actions.push({ action: 'markRead' });
-        }
-        if (savedPreferences.tag) {
-            actions.push({ action: 'addTag', option: savedPreferences.tag });
-        }
-        if (savedPreferences.folder) {
-            actions.push({ action: 'move', option: savedPreferences.folder });
-        }
+        if (preferences.read) actions.push({ action: 'markRead' });
+        if (preferences.tag) actions.push({ action: 'addTag', option: preferences.tag });
+        if (preferences.folder) actions.push({ action: 'move', option: preferences.folder });
     }
     return actions;
 }
@@ -81,4 +79,3 @@ function updateNewMessage(newMessage, action = 'skip', option = '') {
 
     console.log('New message (id:', newMessage.id, ') has been ', action);
 }
-
