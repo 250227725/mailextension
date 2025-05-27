@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const moveCheckbox = document.getElementById('move');
 
     // Init interface
-    workModeRadios.forEach((radio) => {
+    for (const radio of workModeRadios) {
         if (radio.value === preference.mode) {
             radio.checked = true;
         }
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 updateOptions.style.display = 'none';
             }
         });
-    });
+    }
 
     if (preference.mode === 'update') {
         showAndInitUpdateOptions();
@@ -35,22 +35,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const accounts = await browser.accounts.list(true); // true — включает вложенные папки
     const folders = await getFolderListFromAccounts(accounts);
 
-    tags.forEach((tag) => {
+    for (const tag of tags) {
         const option = document.createElement('option');
         option.value = tag.key;
         option.textContent = tag.tag;
         option.selected = tag.key === preference.tag;
         tagList.appendChild(option);
-    });
+    }
 
 
-    folders.forEach((folder) => {
+    for (const folder of folders) {
         const option = document.createElement('option');
         option.value = folder.id;
         option.textContent = folder.name + ' (' + accounts.find((a) => a.id === folder.account).name + ')';
         option.selected = folder.id === preference.folder;
         folderList.appendChild(option);
-    });
+    }
 
     addTagCheckbox.addEventListener('change', () => {
         if (addTagCheckbox.checked) {

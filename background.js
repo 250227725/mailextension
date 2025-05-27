@@ -1,13 +1,11 @@
 browser.messages.onNewMailReceived.addListener(async (folder, newMessageList) => {
     const actions = await getActionSettings();
 
-    console.log(actions);
-
     for (const newMessage of newMessageList.messages) {
         if (await lookupDuplicate(newMessage)) {
-            actions.forEach((action) => {
-                updateNewMessage(newMessage, action.action, action.option);
-            });
+            for (const { action, option } of actions) {
+                updateNewMessage(newMessage, action, option);
+            }
         }
     }
 });
