@@ -1,5 +1,5 @@
 browser.messages.onNewMailReceived.addListener(async (folder, newMessageList) => {
-    const actions = await getActionSettings();
+    const actions = await getActions();
 
     for (const newMessage of newMessageList.messages) {
         if (await lookupDuplicate(newMessage)) {
@@ -10,7 +10,7 @@ browser.messages.onNewMailReceived.addListener(async (folder, newMessageList) =>
     }
 });
 
-async function getActionSettings() {
+async function getActions() {
     const defaultPreferences = {
         mode: 'update',
         read: true,
