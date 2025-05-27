@@ -33,7 +33,7 @@ async function getActions() {
 
 async function lookupDuplicate(newMessage) {
     const messages = await getMessagesFromBD(newMessage);
-    if (Array.isArray(messages) && messages.length > 0) {
+    if (messages.length > 0) {
         for (const message of messages) {
             if (checkMessageForDuplicate(newMessage, message)) {
                 return true;
