@@ -44,11 +44,13 @@ async function lookupDuplicate(newMessage) {
 }
 
 function getMessagesFromBD(message) {
+    const TIME_OFFSET = 5 * 60 * 1000;
+
     return browser.messages
         .query({
             accountId: message.folder.accountId,
             author: message.author,
-            fromDate: new Date(message.date.getTime() - 5 * 60 * 1000),
+            fromDate: new Date(message.date.getTime() - TIME_OFFSET),
             headerMessageId: message.headerMessageId,
             messagesPerPage: 10,
             subject: message.subject,
@@ -58,6 +60,7 @@ function getMessagesFromBD(message) {
         })
         .catch((error) => {
             console.log('Error while find messages from DB:', error);
+            return [];
         });
 }
 
@@ -65,16 +68,16 @@ function checkMessageForDuplicate(newMessage, message) {
     return newMessage.id > message.id;
 }
 
-function updateNewMessage(newMessage, action = 'skip', option = '') {
+async function updateNewMessage(newMessage, action = 'skip', option = '') {
     if (action === 'addTag') {
-        browser.messages.update(newMessage.id, { tags: [option] });
+        await browser.messages.update(newMessage.id, { tags: [option] });
     } else if (action === 'delete') {
-        browser.messages.update(newMessage.id, { read: true });
-        browser.messages.delete([newMessage.id], false);
+        await browser.messages.update(newMessage.id, { read: true });
+        await browser.messages.delete([newMessage.id], false);
     } else if (action === 'move') {
-        browser.messages.move([newMessage.id], option);
+        await browser.messages.move([newMessage.id], option);
     } else if (action === 'markRead') {
-        browser.messages.update(newMessage.id, { read: true });
+        await browser.messages.update(newMessage.id, { read: true });
     }
 
     console.log('New message (id:', newMessage.id, ') has been ', action);
