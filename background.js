@@ -4,7 +4,7 @@ browser.messages.onNewMailReceived.addListener(async (folder, newMessageList) =>
     for (const newMessage of newMessageList.messages) {
         if (await lookupDuplicate(newMessage)) {
             for (const { action, option } of actions) {
-                updateNewMessage(newMessage, action, option);
+                await updateNewMessage(newMessage, action, option);
             }
         }
     }
@@ -52,7 +52,7 @@ function getMessagesFromBD(message) {
             author: message.author,
             fromDate: new Date(message.date.getTime() - TIME_OFFSET),
             headerMessageId: message.headerMessageId,
-            messagesPerPage: 10,
+            messagesPerPage: 2,
             subject: message.subject,
         })
         .then((savedMessages) => {

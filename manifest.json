@@ -1,24 +1,25 @@
 {
     "manifest_version": 3,
-    "name": "Message dublicate destroyer",
+    "name": "Duplicate message manager",
     "version": "1.0",
-    "description": "Extension for removing dublicate messages.",
+    "description": "This extension helps you to manage duplicates of incoming messages. It lookup duplicate messages by account, id, author, date and subject. By default it mark duplicate messages as read. You can also setup action for duplicate messages (delete, move to selected folder, add selected tag).",
     "author": "Sergei Azarov",
+    "homepage_url": "https://github.com/250227725/mailextension",
     "permissions": [
         "storage",
         "accountsRead",
         "messagesRead",
+        "messagesTagsList",
         "messagesUpdate",
         "messagesDelete",
-        "messagesMove",
-        "messagesTagsList"
+        "messagesMove"
     ],
     "background": {
         "scripts": ["background.js"]
     },
     "browser_specific_settings": {
         "gecko": {
-            "id": "message-modifier@example.com",
+            "id": "{b8f4e2a7-9c3d-4f1e-8a6b-2d7c5e9f1a3b}",
             "strict_min_version": "115.0"
         }
     },

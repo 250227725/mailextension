@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const preference = await getPreference();
 
-    // const optionsForm = document.getElementById('options-form');
     const workModeRadios = document.getElementsByName('work-mode');
     const updateOptions = document.getElementById('update-options');
     const tagList = document.getElementById('tag-list');
@@ -11,7 +10,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const addTagCheckbox = document.getElementById('add-tag');
     const moveCheckbox = document.getElementById('move');
 
-    // Init interface
     for (const radio of workModeRadios) {
         if (radio.value === preference.mode) {
             radio.checked = true;
@@ -28,8 +26,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (preference.mode === 'update') {
         showAndInitUpdateOptions();
     }
-
-    // populate tags and folders lists
 
     const tags = await browser.messages.tags.list();
     const accounts = await browser.accounts.list(true); // true — включает вложенные папки
@@ -68,7 +64,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // save options
     saveOptionsButton.addEventListener('click', async (event) => {
         event.preventDefault();
 
@@ -95,22 +90,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         function validateFormData() {
             if (!document.querySelector('input[name="work-mode"]:checked')) {
-                showStatusMessage('Work mode should be deffined', "red");
+                showStatusMessage('Work mode should be defined', "red");
                 return false;
             }
             if (document.querySelector('input[name="work-mode"]:checked').value === 'update') {
                 if (!markReadCheckbox.checked && !addTagCheckbox.checked && !moveCheckbox.checked) {
-                    showStatusMessage('Action should be deffined', "red");
+                    showStatusMessage('Action should be defined', "red");
                     return false;
                 }    
 
                 if (addTagCheckbox.checked && !document.getElementById('tag-list')) {
-                    showStatusMessage('Tag should be deffined', "red");
+                    showStatusMessage('Tag should be defined', "red");
                     return false;
                 }
 
                 if (moveCheckbox.checked && !document.getElementById('folder-list')) {
-                    showStatusMessage('Folder should be deffined', "red");
+                    showStatusMessage('Folder should be defined', "red");
                     return false;
                 }
             }
