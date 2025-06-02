@@ -27,8 +27,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         showAndInitUpdateOptions();
     }
 
-    const tags = await browser.messages.tags.list();
-    const accounts = await browser.accounts.list(true); // true — включает вложенные папки
+    const tags = await messenger.messages.tags.list();
+    const accounts = await messenger.accounts.list(true); // true — включает вложенные папки
     const folders = await getFolderListFromAccounts(accounts);
 
     for (const tag of tags) {
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         async function savePreference(newPreference) {
             try {
-                await browser.storage.local.set(newPreference);
+                await messenger.storage.local.set(newPreference);
                 showStatusMessage("Options saved!", "green");
             } catch (error) {
                 console.error(error);
@@ -168,7 +168,7 @@ async function getPreference() {
         tag: '',
         folder: '',
     };
-    const savedPreferences = await browser.storage.local.get(['mode', 'read', 'tag', 'folder']);
+    const savedPreferences = await messenger.storage.local.get(['mode', 'read', 'tag', 'folder']);
     return { ...defaultPreferences, ...savedPreferences };
 }
 
