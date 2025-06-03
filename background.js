@@ -1,24 +1,20 @@
 messenger.folders.onFolderInfoChanged.addListener(async (folder, folderInfo) => {
-    console.log('Folder info has been changed', folderInfo.newMessageCount);
-    console.log('Folder info has been changed', folder);
-    // 1. Get new messages from folder
-    const actions = await getActions();
+    console.log('Folder info has been changed');
     const newMessages = await getNewMessagesFromFolder(folder);
-    // 2. Update messages
-    for (const newMessage of newMessages) {
-        if (await lookupDuplicate(newMessage)) {
-            for (const { action, option } of actions) {
-                await updateNewMessage(newMessage, action, option);
-            }
-        }
-    }
-}); 
+    await handleNewMessages(newMessages);
+
+});
+
 
 messenger.messages.onNewMailReceived.addListener(async (folder, newMessageList) => {
     console.log('New messages have been received');
-    const actions = await getActions();
     const newMessages = newMessageList.messages;
+    await handleNewMessages(newMessages);
+}, true);
 
+
+async function handleNewMessages(newMessages) {
+    const actions = await getActions();
     for (const newMessage of newMessages) {
         if (await lookupDuplicate(newMessage)) {
             for (const { action, option } of actions) {
@@ -26,7 +22,8 @@ messenger.messages.onNewMailReceived.addListener(async (folder, newMessageList) 
             }
         }
     }
-});
+};
+
 
 async function getActions() {
     const defaultPreferences = {
@@ -37,7 +34,6 @@ async function getActions() {
     };
     const loadPreferences = await messenger.storage.local.get(['mode', 'read', 'tag', 'folder']);
     const preferences = { ...defaultPreferences, ...loadPreferences };
-
     const actions = [];
     if (preferences.mode === 'delete') {
         actions.push({ action: 'delete' });
@@ -49,8 +45,9 @@ async function getActions() {
     return actions;
 }
 
+
 async function lookupDuplicate(newMessage) {
-    const messages = await getMessagesFromBD(newMessage);
+    const messages = await getMessagesFromDB(newMessage);
     if (messages.length > 0) {
         for (const message of messages) {
             if (checkMessageForDuplicate(newMessage, message)) {
@@ -61,9 +58,9 @@ async function lookupDuplicate(newMessage) {
     return false;
 }
 
-function getMessagesFromBD(message) {
-    const TIME_OFFSET = 5 * 60 * 1000;
 
+function getMessagesFromDB(message) {
+    const TIME_OFFSET = 5 * 60 * 1000;
     return messenger.messages
         .query({
             accountId: message.folder.accountId,
@@ -82,9 +79,9 @@ function getMessagesFromBD(message) {
         });
 }
 
+
 function getNewMessagesFromFolder(folder) {
     const TIME_OFFSET = 30 * 60 * 1000;
-
     return messenger.messages
         .query({
             accountId: folder.accountId,
@@ -102,9 +99,11 @@ function getNewMessagesFromFolder(folder) {
         });
 }
 
+
 function checkMessageForDuplicate(newMessage, message) {
     return newMessage.id > message.id;
 }
+
 
 async function updateNewMessage(newMessage, action = 'skip', option = '') {
     if (action === 'addTag') {
@@ -117,6 +116,5 @@ async function updateNewMessage(newMessage, action = 'skip', option = '') {
     } else if (action === 'markRead') {
         await messenger.messages.update(newMessage.id, { read: true });
     }
-
     console.log('New message (id:', newMessage.id, ') has been ', action);
 }

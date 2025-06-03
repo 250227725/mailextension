@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const preference = await getPreference();
-
     const workModeRadios = document.getElementsByName('work-mode');
     const updateOptions = document.getElementById('update-options');
     const tagList = document.getElementById('tag-list');
@@ -9,7 +8,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const markReadCheckbox = document.getElementById('mark-read');
     const addTagCheckbox = document.getElementById('add-tag');
     const moveCheckbox = document.getElementById('move');
-
     for (const radio of workModeRadios) {
         if (radio.value === preference.mode) {
             radio.checked = true;
@@ -22,15 +20,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
-
     if (preference.mode === 'update') {
         showAndInitUpdateOptions();
     }
-
     const tags = await messenger.messages.tags.list();
     const accounts = await messenger.accounts.list(true); // true — включает вложенные папки
     const folders = await getFolderListFromAccounts(accounts);
-
     for (const tag of tags) {
         const option = document.createElement('option');
         option.value = tag.key;
@@ -38,8 +33,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         option.selected = tag.key === preference.tag;
         tagList.appendChild(option);
     }
-
-
     for (const folder of folders) {
         const option = document.createElement('option');
         option.value = folder.id;
@@ -47,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         option.selected = folder.id === preference.folder;
         folderList.appendChild(option);
     }
-
+    
     addTagCheckbox.addEventListener('change', () => {
         if (addTagCheckbox.checked) {
             tagList.style.display = 'block';
@@ -66,7 +59,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     saveOptionsButton.addEventListener('click', async (event) => {
         event.preventDefault();
-
         if (validateFormData()) {
             try {
                 const newPreference = getNewPreference();
@@ -75,8 +67,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.error(error);
             }
         }
-
-
 
         async function savePreference(newPreference) {
             try {
@@ -98,12 +88,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     showStatusMessage('Action should be defined', "red");
                     return false;
                 }    
-
                 if (addTagCheckbox.checked && !document.getElementById('tag-list')) {
                     showStatusMessage('Tag should be defined', "red");
                     return false;
                 }
-
                 if (moveCheckbox.checked && !document.getElementById('folder-list')) {
                     showStatusMessage('Folder should be defined', "red");
                     return false;
