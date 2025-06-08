@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const preference = await getPreference();
+    const folderHandlerCheckbox = document.getElementById('folder-handler');
     const workModeRadios = document.getElementsByName('work-mode');
     const updateOptions = document.getElementById('update-options');
     const tagList = document.getElementById('tag-list');
@@ -8,6 +9,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const markReadCheckbox = document.getElementById('mark-read');
     const addTagCheckbox = document.getElementById('add-tag');
     const moveCheckbox = document.getElementById('move');
+    folderHandlerCheckbox.checked = preference.folderHandler;    
+
     for (const radio of workModeRadios) {
         if (radio.value === preference.mode) {
             radio.checked = true;
@@ -102,6 +105,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     function getNewPreference() {
+        let folderHandler = false;
+        if (folderHandlerCheckbox.checked) {
+            folderHandler = true;
+        }
+        
         let mode = preference.mode;
         const selectedWorkMode = document.querySelector('input[name="work-mode"]:checked');
         if (selectedWorkMode) {
@@ -124,6 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         return {
+            folderHandler,
             mode,
             read,
             tag,
@@ -151,12 +160,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function getPreference() {
     const defaultPreferences = {
+        folderHandler: true,
         mode: 'update',
         read: true,
         tag: '',
         folder: '',
     };
-    const savedPreferences = await messenger.storage.local.get(['mode', 'read', 'tag', 'folder']);
+    const savedPreferences = await messenger.storage.local.get(['folderHandler', 'mode', 'read', 'tag', 'folder']);
     return { ...defaultPreferences, ...savedPreferences };
 }
 
