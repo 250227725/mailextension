@@ -1,8 +1,12 @@
 messenger.folders.onFolderInfoChanged.addListener(async (folder, folderInfo) => {
     console.log('Folder info has been changed');
-    const newMessages = await getNewMessagesFromFolder(folder);
-    await handleNewMessages(newMessages);
-
+    const defaultPreferences = {folderHandler: 'true'};
+    const loadPreferences = await messenger.storage.local.get(['folderHandler']);
+    const preferences = { ...defaultPreferences, ...loadPreferences };
+    if (preferences.folderHandler) {
+        const newMessages = await getNewMessagesFromFolder(folder);
+        await handleNewMessages(newMessages);
+    }   
 });
 
 
@@ -10,7 +14,7 @@ messenger.messages.onNewMailReceived.addListener(async (folder, newMessageList) 
     console.log('New messages have been received');
     const newMessages = newMessageList.messages;
     await handleNewMessages(newMessages);
-}, true);
+});
 
 
 async function handleNewMessages(newMessages) {
